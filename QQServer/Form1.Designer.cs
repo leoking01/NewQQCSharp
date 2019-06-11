@@ -40,9 +40,9 @@
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(119, 12);
+            this.btnStart.Location = new System.Drawing.Point(752, 2);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(75, 23);
+            this.btnStart.Size = new System.Drawing.Size(99, 23);
             this.btnStart.TabIndex = 0;
             this.btnStart.Text = "启动服务";
             this.btnStart.UseVisualStyleBackColor = true;
@@ -52,7 +52,7 @@
             // 
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 12;
-            this.listBox1.Location = new System.Drawing.Point(12, 87);
+            this.listBox1.Location = new System.Drawing.Point(417, 105);
             this.listBox1.Name = "listBox1";
             this.listBox1.ScrollAlwaysVisible = true;
             this.listBox1.Size = new System.Drawing.Size(434, 172);
@@ -60,14 +60,14 @@
             // 
             // txbServerIP
             // 
-            this.txbServerIP.Location = new System.Drawing.Point(94, 60);
+            this.txbServerIP.Location = new System.Drawing.Point(485, 12);
             this.txbServerIP.Name = "txbServerIP";
             this.txbServerIP.Size = new System.Drawing.Size(100, 21);
             this.txbServerIP.TabIndex = 2;
             // 
             // txbServerPort
             // 
-            this.txbServerPort.Location = new System.Drawing.Point(226, 60);
+            this.txbServerPort.Location = new System.Drawing.Point(617, 12);
             this.txbServerPort.Name = "txbServerPort";
             this.txbServerPort.Size = new System.Drawing.Size(79, 21);
             this.txbServerPort.TabIndex = 3;
@@ -75,7 +75,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(23, 63);
+            this.label1.Location = new System.Drawing.Point(414, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(65, 12);
             this.label1.TabIndex = 4;
@@ -84,7 +84,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(209, 63);
+            this.label2.Location = new System.Drawing.Point(600, 15);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(11, 12);
             this.label2.TabIndex = 5;
@@ -92,7 +92,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(341, 12);
+            this.button1.Location = new System.Drawing.Point(752, 60);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(99, 23);
             this.button1.TabIndex = 6;
@@ -102,9 +102,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(226, 12);
+            this.button2.Location = new System.Drawing.Point(752, 31);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(99, 23);
             this.button2.TabIndex = 7;
             this.button2.Text = "停止服务";
             this.button2.UseVisualStyleBackColor = true;
@@ -114,7 +114,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(452, 262);
+            this.ClientSize = new System.Drawing.Size(887, 472);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label2);

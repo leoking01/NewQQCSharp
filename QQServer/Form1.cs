@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+
 //www.srcfans.com
 namespace WindowsFormsApplication1
 {
@@ -35,6 +37,8 @@ namespace WindowsFormsApplication1
 
             txbServerPort.Text = "8000";
             txbServerPort.Update();
+
+            stopFlag_listenClientConnect = false;
         }
 
         public int port = 500;
@@ -48,17 +52,23 @@ namespace WindowsFormsApplication1
             serverIp = IPAddress.Parse(txbServerIP.Text);
             serverIPEndPoint = new IPEndPoint(serverIp, int.Parse(txbServerPort.Text));
             receiveUdpClient = new UdpClient(serverIPEndPoint);
+
             //启动接收线程
             Thread receiveThread = new Thread(ReceiveMessage);
             receiveThread.Start();
             btnStart.Enabled = false;
+
             //创建监听套接字
             tcpListener = new TcpListener(serverIp, int.Parse(txbServerPort.Text));
             tcpListener.Start(100);
+
             //启动监听线程
               listenThread = new Thread(ListenClientConnect);
             listenThread.Start();
+
             listBox1.Items.Add(string.Format("服务器线程{0}启动，监听端口{1}", serverIPEndPoint, int.Parse(txbServerPort.Text)));
+
+            stopFlag_listenClientConnect = false;
         }
 
         //接收消息
@@ -145,6 +155,7 @@ namespace WindowsFormsApplication1
             }
         }
 
+
         //向客户端发送消息
         private void SendtoClient(User user, string message)
         {
@@ -156,6 +167,7 @@ namespace WindowsFormsApplication1
             sendUdpClient.Close();
         }
 
+        bool  stopFlag_listenClientConnect;
 
         //接受客户端的连接
         private void ListenClientConnect()
@@ -175,6 +187,9 @@ namespace WindowsFormsApplication1
                 }
                 Thread sendThread = new Thread(SendData);
                 sendThread.Start(newClient);
+
+                if( stopFlag_listenClientConnect )
+                    break;
             }
         }
 
@@ -199,11 +214,13 @@ namespace WindowsFormsApplication1
             newUserClient.Close();
         }
 
+
         //退出服务端应用
         private void button1_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
+
 
         //停止服务---没写好。
         private void button2_Click(object sender, EventArgs e)
@@ -215,6 +232,7 @@ namespace WindowsFormsApplication1
             //  serverIPEndPoint.release    
             listBox1.Items.Add(string.Format("(没写好 )服务器线程{0}停止，监听端口{1}", serverIPEndPoint, int.Parse(txbServerPort.Text)));
             //   btnStart.Enabled = true;
+            stopFlag_listenClientConnect = true;
         }
     }
 
