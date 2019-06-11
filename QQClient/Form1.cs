@@ -29,33 +29,55 @@ namespace New_QQ
         private static NetworkStream networkStream;
         private static Thread receiveThread;
         private static Thread sendThread;
+
+        //初始化
         public Form1()
         {
             Control.CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
+
+            txtserverIP.Text = "127.0.0.1";
+            txtServerPort.Text = "8000";
+            txtserverIP.Update();
+
+            txtusername.Text = "David";
+            txtusername.Update();
+
+            txtLocalIP.Text = "127.0.0.1";
+            txtlocalport.Text = "8001";
+            txtLocalIP.Update();
         }
 
+        //登录
         private void button1_Click(object sender, EventArgs e)
         {
             //创建接受套接字
             clientIP = IPAddress.Parse(txtLocalIP.Text);
             clientIPEndPoint = new IPEndPoint(clientIP, int.Parse(txtlocalport.Text));
-            serverIpEndPoint=new IPEndPoint(IPAddress.Parse(txtserverIP.Text),int.Parse(txtServerPort.Text) );
+            serverIpEndPoint = new IPEndPoint(IPAddress.Parse(txtserverIP.Text), int.Parse(txtServerPort.Text));
             receiveUdpClient = new UdpClient(clientIPEndPoint);
+
             //启动接受线程
             receiveThread = new Thread(ReceiveMessage);
             receiveThread.Start();
+
             //匿名发送
             sendUdpClient = new UdpClient(0);
+
             //启动发送线程
             sendThread = new Thread(SendMessage);
             sendThread.Start(string.Format("login,{0},{1}", txtusername.Text, clientIPEndPoint));
-            button1.Enabled = false;
+            button1_logIn.Enabled = false;
             this.Text = txtusername.Text;
-            button2.Enabled = true;
-            this.ControlBox = false;
+            button2_logOut.Enabled = true;
+
+            if (true)
+            {
+                this.ControlBox = false;  //隐藏控制箱
+            }
         }
 
+        //接收信息
         private void ReceiveMessage()
         {
             remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
@@ -84,42 +106,41 @@ namespace New_QQ
                             }
                             catch
                             {
-
                                 MessageBox.Show("连接失败");
                             }
                             Thread getUserListThread = new Thread(GetUserList);
                             getUserListThread.Start();
                             break;
-                        case "login":                        
-                            listView1.Items.Add(splitstring[1]+","+splitstring[2]);
+                        case "login":
+                            listView1.Items.Add(splitstring[1] + "," + splitstring[2]);
                             break;
                         case "logout":
                             string userItem = splitstring[1] + "," + splitstring[2];
                             foreach (ListViewItem lvItem in listView1.Items)
                             {
-                                if (lvItem.Text==userItem)
+                                if (lvItem.Text == userItem)
                                 {
                                     listView1.Items.Remove(lvItem);
                                 }
                             }
                             break;
                         case "talk":
-                            string message2 = splitstring[2] + "   " + splitstring[1] + '\n' + "  " + splitstring[3]+'\n';
+                            string message2 = splitstring[2] + "   " + splitstring[1] + '\n' + "  " + splitstring[3] + '\n';
                             richTextBox1.AppendText(message2);
                             break;
                         case "qunliao":
-                            string message3 = splitstring[2] + "   " + splitstring[1] + '\n' + "  " + splitstring[3]+'\n';
+                            string message3 = splitstring[2] + "   " + splitstring[1] + '\n' + "  " + splitstring[3] + '\n';
                             richTextBox2.AppendText(message3);
                             break;
                     }
                 }
                 catch
                 {
-
                     break;
                 }
             }
         }
+
         //通过服务器获得在线的好友列表  Tcp协议
         private void GetUserList()
         {
@@ -149,6 +170,7 @@ namespace New_QQ
             }
         }
 
+        //发送消息
         public void SendMessage(object obj)
         {
             string message = (string)obj;
@@ -157,6 +179,8 @@ namespace New_QQ
             IPEndPoint remoteIpEndPoint = new IPEndPoint(remoteIp, int.Parse(txtServerPort.Text));
             sendUdpClient.Send(sendBytes, sendBytes.Length, remoteIpEndPoint);
         }
+
+
         //注销按钮 通知服务器注销 Udp协议
         private void button2_Click(object sender, EventArgs e)
         {
@@ -165,26 +189,28 @@ namespace New_QQ
             receiveUdpClient.Close();
             receiveThread.Abort();
             sendThread.Abort();
-            button2.Enabled = false;
-            button1.Enabled = true;
+            button2_logOut.Enabled = false;
+            button1_logIn.Enabled = true;
             Application.Exit();
             Application.ExitThread();
         }
+
         //双击好友列表进行p2p模式聊天  Udp协议
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             string userinfo = listView1.FocusedItem.Text.ToString();
             string[] array = userinfo.Split(',');
             string[] array1 = array[1].Split(':');
-            IPEndPoint chatobject=new IPEndPoint(IPAddress.Parse(array1[0]),int.Parse(array1[1]));
+            IPEndPoint chatobject = new IPEndPoint(IPAddress.Parse(array1[0]), int.Parse(array1[1]));
             Form2 a = new Form2(this, chatobject, txtusername.Text);
-            a.Text = "与"+array[0]+"聊天中";
+            a.Text = "与" + array[0] + "聊天中";
             a.Show();
         }
+
         //对当前在线好友群发消息 通过服务器转发 
         private void button3_Click(object sender, EventArgs e)
         {
-            Form3 b=new Form3(serverIpEndPoint,txtusername.Text);
+            Form3 b = new Form3(serverIpEndPoint, txtusername.Text);
             b.Text = "与当前在线好友群聊中";
             b.Show();
         }
