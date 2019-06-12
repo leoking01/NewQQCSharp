@@ -155,7 +155,7 @@
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listView1.Location = new System.Drawing.Point(7, 153);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(229, 97);
+            this.listView1.Size = new System.Drawing.Size(229, 249);
             this.listView1.TabIndex = 12;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.List;
@@ -173,17 +173,17 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(242, 52);
+            this.richTextBox1.Location = new System.Drawing.Point(242, 24);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(160, 198);
+            this.richTextBox1.Size = new System.Drawing.Size(616, 169);
             this.richTextBox1.TabIndex = 14;
             this.richTextBox1.Text = "";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(295, 27);
+            this.label7.Location = new System.Drawing.Point(267, 9);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(53, 12);
             this.label7.TabIndex = 15;
@@ -192,7 +192,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(476, 27);
+            this.label8.Location = new System.Drawing.Point(267, 196);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(41, 12);
             this.label8.TabIndex = 16;
@@ -200,10 +200,10 @@
             // 
             // richTextBox2
             // 
-            this.richTextBox2.Location = new System.Drawing.Point(408, 52);
+            this.richTextBox2.Location = new System.Drawing.Point(242, 211);
             this.richTextBox2.Name = "richTextBox2";
             this.richTextBox2.ReadOnly = true;
-            this.richTextBox2.Size = new System.Drawing.Size(168, 198);
+            this.richTextBox2.Size = new System.Drawing.Size(616, 191);
             this.richTextBox2.TabIndex = 17;
             this.richTextBox2.Text = "";
             // 
@@ -221,7 +221,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(588, 262);
+            this.ClientSize = new System.Drawing.Size(870, 414);
             this.Controls.Add(this.button3_sendMessageInGroup);
             this.Controls.Add(this.richTextBox2);
             this.Controls.Add(this.label8);

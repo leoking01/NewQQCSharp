@@ -18,14 +18,21 @@ namespace WindowsFormsApplication1
 {
     public partial class Form1 : Form
     {
-        private static ListBox listbox1 = listbox1;
-        private static int tcpPort;
+        //private static ListBox listbox1 = listbox1;
+        //private static int tcpPort;
         private static UdpClient receiveUdpClient;
+        private static TcpListener tcpListener;
+
         private static IPAddress serverIp;
         private static IPEndPoint serverIPEndPoint;
         private static IPEndPoint remoteIPEndPoint;
-        private static TcpListener tcpListener;
+
         Thread listenThread;
+        Thread receiveThread;
+
+        bool stopFlag_listenClientConnect;
+        bool stopFlag_receiveMessage;
+
 
         public Form1()
         {
@@ -39,11 +46,11 @@ namespace WindowsFormsApplication1
             txbServerPort.Update();
 
             stopFlag_listenClientConnect = false;
+            stopFlag_receiveMessage = false;
         }
 
         public int port = 500;
         private List<User> userList = new List<User>();
-
 
         //启动服务
         private void btnStart_Click(object sender, EventArgs e)
@@ -53,8 +60,8 @@ namespace WindowsFormsApplication1
             serverIPEndPoint = new IPEndPoint(serverIp, int.Parse(txbServerPort.Text));
             receiveUdpClient = new UdpClient(serverIPEndPoint);
 
-            //启动接收线程
-            Thread receiveThread = new Thread(ReceiveMessage);
+            //启动接收信息的线程
+            receiveThread = new Thread(ReceiveMessage);
             receiveThread.Start();
             btnStart.Enabled = false;
 
@@ -63,12 +70,13 @@ namespace WindowsFormsApplication1
             tcpListener.Start(100);
 
             //启动监听线程
-              listenThread = new Thread(ListenClientConnect);
+            listenThread = new Thread(ListenClientConnect);
             listenThread.Start();
 
-            listBox1.Items.Add(string.Format("服务器线程{0}启动，监听端口{1}", serverIPEndPoint, int.Parse(txbServerPort.Text)));
+            listBox1.Items.Add(string.Format("[1][服务端启动]服务器线程{0}启动，监听端口{1}", serverIPEndPoint, int.Parse(txbServerPort.Text)));
 
             stopFlag_listenClientConnect = false;
+            stopFlag_receiveMessage = false;
         }
 
         //接收消息
@@ -79,13 +87,16 @@ namespace WindowsFormsApplication1
             {
                 try
                 {
+                    if(stopFlag_receiveMessage)
+                        break;
+
                     string[] splitsubstring = null;
                     IPEndPoint clientIPEndPoint = null;
                     //关闭receiveUdpClient时下面一行代码会产生异常
                     byte[] receiveBytes = receiveUdpClient.Receive(ref remoteIPEndPoint);
                     string message = Encoding.Unicode.GetString(receiveBytes, 0, receiveBytes.Length);
                     //显示消息内容
-                    listBox1.Items.Add(string.Format("{0}:{1}", remoteIPEndPoint, message));
+                    listBox1.Items.Add(string.Format("[服务端接收数据]{0}:{1}", remoteIPEndPoint, message));
                     //处理消息数据
                     //服务器接受消息后做处理
                     string[] splitstring = message.Split(',');
@@ -103,11 +114,11 @@ namespace WindowsFormsApplication1
                             User user = new User(splitstring[1], clientIPEndPoint);
                             //往在线的用户列表添加新成员
                             userList.Add(user);
-                            listBox1.Items.Add(string.Format("用户{0}{1}加入", user.GetName(), user.GetIPEndPoint()));
+                            listBox1.Items.Add(string.Format("[服务端接收数据]用户{0}{1}加入", user.GetName(), user.GetIPEndPoint()));
                             string sendString = "Accept," + txbServerPort.Text;
                             //向客户端发送应答消息
                             SendtoClient(user, sendString);
-                            listBox1.Items.Add(string.Format("向{0}{1}发出:[{2}]", user.GetName(), user.GetIPEndPoint(), sendString));
+                            listBox1.Items.Add(string.Format("[服务端接收数据]向{0}{1}发出:[{2}]", user.GetName(), user.GetIPEndPoint(), sendString));
                             for (int i = 0; i < userList.Count; i++)
                             {
                                 if (userList[i].GetName() != user.GetName())
@@ -117,7 +128,7 @@ namespace WindowsFormsApplication1
                                     SendtoClient(userList[i], message);
                                 }
                             }
-                            listBox1.Items.Add(string.Format("广播:[{0}]", message));
+                            listBox1.Items.Add(string.Format("[服务端接收数据]广播:[{0}]", message));
                             break;
                         case "logout":
                             for (int i = 0; i < userList.Count; i++)
@@ -125,25 +136,25 @@ namespace WindowsFormsApplication1
                                 if (userList[i].GetName() == splitstring[1])
                                 {
                                     userList.RemoveAt(i); //移除用户
-                                    listBox1.Items.Add(string.Format("用户{0}({1})退出", userList[i].GetName(), userList[i].GetIPEndPoint()));
+                                    listBox1.Items.Add(string.Format("[服务端接收数据]用户{0}({1})退出", userList[i].GetName(), userList[i].GetIPEndPoint()));
                                 }
                                 for (int j = 0; j < userList.Count; j++)
                                 {
                                     //广播注销消息
                                     SendtoClient(userList[i], message);
                                 }
-                                listBox1.Items.Add(string.Format("广播:[{0}]", message));
+                                listBox1.Items.Add(string.Format("[服务端接收数据]广播:[{0}]", message));
                                 break;
                             }
                             break;
                         case "qunliao":
-                            listBox1.Items.Add("收到群发消息");
+                            listBox1.Items.Add("[服务端接收数据]收到群发消息");
                             for (int j = 0; j < userList.Count; j++)
                             {
                                 //广播注销消息
                                 SendtoClient(userList[j], message);
                             }
-                            listBox1.Items.Add(string.Format("广播:[{0}]", message));
+                            listBox1.Items.Add(string.Format("[服务端接收数据]广播:[{0}]", message));
                             break;
                     }
                 }
@@ -151,7 +162,7 @@ namespace WindowsFormsApplication1
                 {
                     break;
                 }
-                listBox1.Items.Add(string.Format("服务线程{0}终止", serverIPEndPoint));
+                listBox1.Items.Add(string.Format("[服务端接收数据]serverIPEndPoint={0} 接收消息   ", serverIPEndPoint));
             }
         }
 
@@ -167,7 +178,7 @@ namespace WindowsFormsApplication1
             sendUdpClient.Close();
         }
 
-        bool  stopFlag_listenClientConnect;
+
 
         //接受客户端的连接
         private void ListenClientConnect()
@@ -178,18 +189,20 @@ namespace WindowsFormsApplication1
                 try
                 {
                     newClient = tcpListener.AcceptTcpClient();
-                    listBox1.Items.Add(string.Format("接受客户端{0}的TCP请求", newClient.Client.RemoteEndPoint));
+                    listBox1.Items.Add(string.Format("[监听连接]:接受客户端{0}的TCP请求", newClient.Client.RemoteEndPoint));
+
+                    Thread sendThread = new Thread(SendData);
+                    sendThread.Start(newClient);
+
+                    if (stopFlag_listenClientConnect)
+                        break;
                 }
                 catch (Exception)
                 {
-                    listBox1.Items.Add(string.Format("监听线程({0}:{1})", serverIp, int.Parse(txbServerPort.Text)));
+                    listBox1.Items.Add(string.Format("[监听连接(异常)]:监听线程({0}:{1})", serverIp, int.Parse(txbServerPort.Text)));
                     break;
                 }
-                Thread sendThread = new Thread(SendData);
-                sendThread.Start(newClient);
 
-                if( stopFlag_listenClientConnect )
-                    break;
             }
         }
 
@@ -209,7 +222,8 @@ namespace WindowsFormsApplication1
             BinaryWriter binaryWriter = new BinaryWriter(networkStream);
             binaryWriter.Write(userListstring);
             binaryWriter.Flush();
-            listBox1.Items.Add(string.Format("向{0}发送[{1}]", newUserClient.Client.RemoteEndPoint, userListstring));
+            listBox1.Items.Add(string.Format("[服务端向客户端发送数据]向{0}发送[{1}]", 
+                newUserClient.Client.RemoteEndPoint, userListstring));
             binaryWriter.Close();
             newUserClient.Close();
         }
@@ -225,15 +239,19 @@ namespace WindowsFormsApplication1
         //停止服务---没写好。
         private void button2_Click(object sender, EventArgs e)
         {
+            receiveThread.Suspend();
+            receiveThread.Abort();
             listenThread.Suspend();  //();
             listenThread.Abort();
+
+            receiveUdpClient.Close();
             tcpListener.Stop();  //100);
-            //  tcpListener.Stop();   //100);
-            //  serverIPEndPoint.release    
-            listBox1.Items.Add(string.Format("(没写好 )服务器线程{0}停止，监听端口{1}", serverIPEndPoint, int.Parse(txbServerPort.Text)));
-            //   btnStart.Enabled = true;
+
             stopFlag_listenClientConnect = true;
+            stopFlag_receiveMessage = true;
+
+
+            listBox1.Items.Add(string.Format("(没写好 )服务器线程{0}停止，监听端口{1}", serverIPEndPoint, int.Parse(txbServerPort.Text)));
         }
     }
-
 }
